@@ -1,0 +1,42 @@
+# MekoTools — große Modelldateien vom VPS statt aus dem Heimanschluss.
+#
+# Die bestehende Regel (mekotools.yml) leitet ALLES an flip, Priorität 30.
+# Hier stehen zwei Regeln mit Priorität 50 für genau die großen Pfade; sie
+# gewinnen und liefern vom örtlichen nginx. Alles andere (die Anwendungen
+# selbst, ihre kleinen Dateien) geht unverändert an flip.
+#
+# Die Adresse bleibt dieselbe: die Werkzeuge merken von der Verlagerung
+# nichts, ihre Sicherheitsregel "connect-src 'self'" gilt weiter.
+#
+# Zurücknehmen: diese Datei löschen — Traefik liest den Ordner selbst nach.
+
+http:
+  routers:
+    mekotools-modelle-sprach:
+      rule: "Host(`sprachmodell.mekotools.de`) && (PathPrefix(`/modelle`) || PathPrefix(`/wasm`))"
+      entryPoints: [websecure]
+      priority: 50
+      service: mekotools-modelle
+      tls:
+        certResolver: kas
+        domains:
+          - main: "mekotools.de"
+            sans:
+              - "*.mekotools.de"
+    mekotools-modelle-vorlesen:
+      rule: "Host(`sherpa-tts.mekotools.de`) && (PathPrefix(`/stimmen`) || PathPrefix(`/sherpa-onnx-wasm-main-tts.`) || PathPrefix(`/sherpa-onnx-tts.`))"
+      entryPoints: [websecure]
+      priority: 50
+      service: mekotools-modelle
+      tls:
+        certResolver: kas
+        domains:
+          - main: "mekotools.de"
+            sans:
+              - "*.mekotools.de"
+
+  services:
+    mekotools-modelle:
+      loadBalancer:
+        servers:
+          - url: "http://mekotools-modelle:80"

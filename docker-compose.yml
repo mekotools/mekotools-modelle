@@ -1,0 +1,29 @@
+# MekoTools — große Modelldateien auf dem VPS.
+#
+# Warum hier und nicht auf flip: flip hängt hinter einem Kabelanschluss mit
+# 26 Mbit/s aufwärts (gemessen 2,8–3,0 MB/s am 08.10.2026). Die Modelle sind
+# 372 MB groß — das sind über 90 Sekunden Wartezeit beim ersten Besuch. Der
+# VPS liefert im Rechenzentrum mit gemessenen 425 Mbit/s.
+#
+# Der Behälter liefert nur Dateien aus, keine Anwendung: er kennt keine
+# Weiterleitung, keine Sitzungen, keine Schreibzugriffe (Einbindung nur lesend).
+services:
+  modelle:
+    image: nginx:1.27-alpine
+    container_name: mekotools-modelle
+    restart: unless-stopped
+    volumes:
+      - ./DATA:/usr/share/nginx/html:ro
+      - ./nginx-server.conf:/etc/nginx/conf.d/default.conf:ro
+    networks: [traefik-proxy]
+    labels:
+      # Kein eigener Router über den Docker-Anbieter — die Weiterleitung steht
+      # ausdrücklich als Datei in /opt/container/traefik/DATA/external/.
+      - traefik.enable=false
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+
+networks:
+  traefik-proxy:
+    external: true

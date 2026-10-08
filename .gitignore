@@ -1,0 +1,4 @@
+# Die Modelldateien selbst liegen nicht im Git — sie kommen aus den Abbildern.
+# Sie sind Daten (372 MB), keine Quelle. Wiederherstellen: ./holen.sh <werte>
+DATA/
+auspacken/

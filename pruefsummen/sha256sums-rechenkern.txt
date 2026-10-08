@@ -1,0 +1,1 @@
+25495a03bf7ac80a1925bc91e236c74c3ad52be89a9ed0d0eeb18e4a9d135234  Qwen2-0.5B-Instruct-q4f16_1-ctx4k_cs1k-webgpu.wasm
